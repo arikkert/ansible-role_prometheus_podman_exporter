@@ -1,7 +1,7 @@
 galaxy_info:
   role_name: prometheus_podman_exporter
   author: Andre Rikkert de Koe
-  description: export node data to Prometheus
+  description: export podman data to Prometheus
   company: ARK-ICT
   namespace: arikkert
 
