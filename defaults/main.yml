@@ -1,0 +1,3 @@
+---
+# defaults file for ansible-role_prometheus_podman_exporter
+exporter_port: 9882

@@ -1,0 +1,75 @@
+---
+# tasks file for role-prometheus_podman_exporter
+#
+
+#
+# Install packages for each OS family
+#
+
+- name: RedHat 9 block
+  when: ansible_os_family == 'RedHat' and (ansible_distribution_major_version | int) == 9
+  block:
+    - name: Ensure EPEL packages can be installed for RedHat 9
+      ansible.builtin.dnf:
+        name:
+          - yum-utils
+    - name: Enable crb repository for RedHat 9
+      ansible.builtin.command: dnf config-manager --set-enabled crb
+      changed_when: false
+      when: ansible_distribution_major_version | int == 9
+    - name: Ensure EPEL repo is installed for RedHat 9
+      ansible.builtin.dnf:
+        name:
+          - epel-release
+    - name: Ensure packages are installed for RedHat 9
+      ansible.builtin.dnf:
+        name:
+          - prometheus-podman-exporter
+
+#
+# Configure
+# RedHat all versions
+#
+
+- name: RedHat
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Ensure status firewalld is registered
+      ansible.builtin.command: systemctl status firewalld
+      register: firewalld_status
+      changed_when: false
+      failed_when: false
+      check_mode: false
+    - name: Ensure when firewalld already running it is configured to allow podman_exporter to be exposed from the prometheus_ip
+      ansible.posix.firewalld:
+        state: enabled
+        rich_rule: 'rule family="ipv4" source address="{{ prometheus_ip }}" port port="{{ item }}" protocol="tcp" accept'
+        immediate: true
+        permanent: true
+      loop:
+        - "{{ exporter_port }}"
+      when: firewalld_status.rc == 0 and prometheus_ip is defined
+    - name: Ensure when firewalld already running it is configured to allow podman_eporter to be exposed
+      ansible.posix.firewalld:
+        state: enabled
+        port: "{{ item }}"
+        immediate: true
+        permanent: true
+      loop:
+        - "{{ exporter_port }}/tcp"
+      when: firewalld_status.rc == 0 and prometheus_ip is not defined
+
+# Configure
+# RedHat
+#
+
+- name: RedHat
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Ensure prometheus-podman-exporter is running
+      ansible.builtin.service:
+        name: prometheus-podman-exporter
+        state: started
+        enabled: true
+
+...

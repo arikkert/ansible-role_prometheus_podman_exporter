@@ -1,0 +1,7 @@
+---
+# handlers file for ansible-role_prometheus_podman_exporter
+
+- name: Reload podman
+  ansible.builtin.service:
+    name: httpd
+    state: reloaded
