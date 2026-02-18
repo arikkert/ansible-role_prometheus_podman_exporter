@@ -8,7 +8,7 @@ Requirements
 
 For RedHat OS family
 EPEL repo (will be installed if not found)
-Tested on Almalinux 9
+Tested on Almalinux 9 and 10
 
 Role Variables
 --------------

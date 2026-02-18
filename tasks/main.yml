@@ -6,22 +6,22 @@
 # Install packages for each OS family
 #
 
-- name: RedHat 9 block
-  when: ansible_os_family == 'RedHat' and (ansible_distribution_major_version | int) == 9
+- name: RedHat 9/10 block
+  when: ansible_os_family == 'RedHat' and (ansible_distribution_major_version | int) >= 9
   block:
-    - name: Ensure EPEL packages can be installed for RedHat 9
+    - name: Ensure EPEL packages can be installed for RedHat >=9
       ansible.builtin.dnf:
         name:
           - yum-utils
-    - name: Enable crb repository for RedHat 9
+    - name: Enable crb repository for RedHat >=9
       ansible.builtin.command: dnf config-manager --set-enabled crb
       changed_when: false
-      when: ansible_distribution_major_version | int == 9
-    - name: Ensure EPEL repo is installed for RedHat 9
+      when: ansible_distribution_major_version | int >= 9
+    - name: Ensure EPEL repo is installed for RedHat >= 9
       ansible.builtin.dnf:
         name:
           - epel-release
-    - name: Ensure packages are installed for RedHat 9
+    - name: Ensure packages are installed for RedHat >=9
       ansible.builtin.dnf:
         name:
           - prometheus-podman-exporter
